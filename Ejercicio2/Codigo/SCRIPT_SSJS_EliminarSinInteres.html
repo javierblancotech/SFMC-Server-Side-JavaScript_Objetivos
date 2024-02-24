@@ -1,0 +1,33 @@
+<script runat="server">
+    Platform.Load("Core", "1.1.1");
+    
+    var sourceDE = "DE_02_SSJS_Ejercicio"; // La Data Extension de origen
+    var logDE = "DE_Log_Error"; // La Data Extension de log de errores
+    
+    try {
+        var dataExtension = DataExtension.Init(sourceDE);
+        var dataRows = dataExtension.Rows.Retrieve();
+    
+        for (var i = 0; i < dataRows.length; i++) {
+            var row = dataRows[i];
+            // Comprobamos si el campo Intereses está vacío
+            if (!row.Intereses) {
+                try {
+                    var rowDelete = Platform.Function.DeleteData(sourceDE, ["Id"], [row.Id]);
+                } catch (e) {
+                    // Captura y maneja errores específicos de la eliminación de la fila
+                    // y los inserta en la Data Extension de Log_Error
+                    var logRow = {Log_message: "Error al eliminar fila con ID: " + row.Id, Email: row.Email, Error: e.message};
+                    var logDataExtension = DataExtension.Init(logDE);
+                    logDataExtension.Rows.Add(logRow);
+                }
+            }
+        }
+    } catch (e) {
+        // Captura y maneja errores generales del script y los inserta en la Data Extension de Log_Error
+        var logRow = {Log_message: "Error en el script: " + e.message, Error: e.message};
+        var logDataExtension = DataExtension.Init(logDE);
+        logDataExtension.Rows.Add(logRow);
+    }
+    </script>
+    

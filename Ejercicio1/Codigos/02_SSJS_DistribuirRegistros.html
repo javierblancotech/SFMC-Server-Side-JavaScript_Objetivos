@@ -1,0 +1,70 @@
+<script runat="server">
+    Platform.Load("core", "1.1.1");
+
+    var sourceDEName = "DE_01_Inicial_SSJS_Ejercicio";
+    var logDEName = "DE_Log_Error01";
+
+    // Función mejorada para registrar errores con más detalles
+    function logError(error, additionalInfo) {
+        additionalInfo = additionalInfo || {}; // Asegura que additionalInfo sea un objeto si no se proporciona
+        var logDataExtension = DataExtension.Init(logDEName);
+        var currentDate = Platform.Function.SystemDateToLocalDate(Platform.Function.Now());
+        var errorDetails = {
+            "Log_message": error.message || 'Error sin mensaje', // Usa el mensaje de error o un mensaje predeterminado
+            "Email": additionalInfo.email || '', // Usa el email de additionalInfo o una cadena vacía si no está presente
+            "Error": 'Nombre del error: ' + (error.name || 'N/A') +
+                ', Línea: ' + (error.lineNumber || 'N/A') +
+                ', Descripción: ' + (error.message || 'N/A') +
+                ', Stack: ' + (error.stack || 'N/A'), // Incluye detalles del stack si están disponibles
+            "DataExtension": name, // Nombre de la Data Extension donde se registra el error
+            "Fecha": currentDate // Fecha actual
+        };
+        logDataExtension.Rows.Add(errorDetails);
+    }
+
+    // Función para verificar si una Data Extension existe
+    function doesDEExist(name) {
+        // Recupera la Data Extension por nombre
+        var deRetrieve = DataExtension.Retrieve({ Property: "Name", SimpleOperator: "equals", Value: name });
+        // Devuelve verdadero si la DE existe, falso si no
+        return deRetrieve && deRetrieve.length > 0;
+    }
+
+    // Función para distribuir registros en sus correspondientes Data Extensions
+    function distributeRecords() {
+        try {
+            var sourceDE = DataExtension.Init(sourceDEName);
+            var registros = sourceDE.Rows.Retrieve();
+
+            for (var i = 0; i < registros.length; i++) {
+                var registro = registros[i];
+                var interes = registro.Intereses;
+
+                if (interes) {
+                    // Verificar si la Data Extension correspondiente ya existe
+                    if (!doesDEExist(interes)) {
+                        // Si no existe, crea la Data Extension
+                        createDE(interes);
+                    }
+
+                    // Insertar el registro en la Data Extension correspondiente
+                    var targetDE = DataExtension.Init(interes);
+                    targetDE.Rows.Add(registro);
+                }
+            }
+        } catch (e) {
+            // Si hay un error en el proceso principal, lo registra en la DE de errores
+            logError("Error al distribuir registros: " + e.message);
+        }
+    }
+
+    // Resto del código (incluyendo las funciones createDE y logInsert) se mantiene igual
+
+    // Bloque principal del script que se ejecuta
+    try {
+        distributeRecords();
+    } catch (e) {
+        // Si hay un error en el proceso principal, lo registra en la DE de errores
+        logError("Error en el script general: " + e.message);
+    }
+</script>

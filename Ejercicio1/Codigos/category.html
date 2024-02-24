@@ -1,0 +1,34 @@
+<script runat="server">
+    Platform.Load("core", "1");
+    
+    var api = new Script.Util.WSProxy();
+    var logDEName = "Log_CategoryId"; // Nombre de la Data Extension de logs
+
+    // Función para registrar el CategoryID o errores en la Data Extension de logs
+    function logCategoryID(folderName, parentFolderName, categoryID, error) {
+        var logDataExtension = DataExtension.Init(logDEName);
+        var logDetails = {
+            LogDate: Platform.Function.SystemDateToLocalDate(Platform.Function.Now()), // Registra la fecha y hora actual
+            CategoryID: categoryID || 'N/A', // Registra el CategoryID o 'N/A' si no está disponible
+            FolderName: folderName || 'N/A', // Registra el nombre de la carpeta
+            ParentFolderName: parentFolderName || 'N/A', // Registra el nombre de la carpeta padre
+            ErrorMessage: error || '' // Registra el mensaje de error si hay uno
+        };
+        logDataExtension.Rows.Add(logDetails);
+    }
+
+    try {
+        // ... Tu lógica para recuperar el CategoryID ...
+        
+        if (categoryID) {
+            // Si se encuentra el CategoryID, registra la información
+            logCategoryID(targetFolderName, parentFolderName, categoryID, null);
+        } else {
+            // Si no se encuentra el CategoryID, registra el error
+            logCategoryID(targetFolderName, parentFolderName, null, "No se encontró el CategoryID.");
+        }
+    } catch(error) {
+        // Si hay un error en el proceso, registra el error
+        logCategoryID(targetFolderName, parentFolderName, null, error.message);
+    }
+</script>

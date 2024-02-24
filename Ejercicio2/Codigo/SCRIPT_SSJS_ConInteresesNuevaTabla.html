@@ -1,0 +1,40 @@
+<script runat="server">
+    Platform.Load("Core", "1");
+    
+    var DEOrigenName = "DE_02_SSJS_Ejercicio";
+    var DEDestinoName = "DE_02_SSJS_Ejercicio_SSJSConInteres";
+    
+    // Inicializar la Data Extension de origen
+    var deOrigen = DataExtension.Init(DEOrigenName);
+    // Recuperar registros donde "Intereses" no es nulo ni vacío
+    var dataRows = deOrigen.Rows.Retrieve();
+    
+    // Inicializar la Data Extension de destino
+    var deDestino = DataExtension.Init(DEDestinoName);
+    
+    if(dataRows && dataRows.length > 0) {
+        for(var i=0; i<dataRows.length; i++) {
+            try {
+                // Comprobar si el campo "Intereses" está rellenado
+                var intereses = dataRows[i]["Intereses"];
+                if(intereses != null && intereses != "") {
+                    // Insertar el registro en la Data Extension de destino
+                    deDestino.Rows.Add({
+                        Id: dataRows[i]["Id"],
+                        Email: dataRows[i]["Email"],
+                        Intereses: intereses
+                    });
+                }
+            } catch(e) {
+                // Se inserta un Log de error
+                var logDE = DataExtension.Init("DE_Log_Error");
+                logDE.Rows.Add({
+                    "Log_message": "Hubo un error al insertar el registro",
+                    "Email": dataRows[i]["Email"],
+                    "Error": String(e)
+                });
+            }
+        }
+    }
+    </script>
+    

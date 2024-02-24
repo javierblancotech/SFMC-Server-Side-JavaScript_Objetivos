@@ -1,0 +1,130 @@
+<script runat="server">
+    Platform.Load("core", "1.1.1");
+
+    var nombreDEOrigen = "DE_01_Inicial_SSJS_Ejercicio";
+    var nombreDELog = "DE_Log_Error01";
+
+    // Función mejorada para registrar errores con más detalles
+    function registrarError(error, infoAdicional) {
+        infoAdicional = infoAdicional || {}; // Asegura que infoAdicional sea un objeto si no se proporciona
+        var logExtensionDatos = DataExtension.Init(nombreDELog);
+        var fechaActual = Platform.Function.SystemDateToLocalDate(Platform.Function.Now());
+        var detallesError = {
+            "Log_message": error.message || 'Error sin mensaje', // Usa el mensaje de error o un mensaje predeterminado
+            "Email": infoAdicional.email || '', // Usa el email de infoAdicional o una cadena vacía si no está presente
+            "Error": 'Nombre del error: ' + (error.nombre || 'N/A') +
+                ', Línea: ' + (error.lineNumber || 'N/A') +
+                ', Descripción: ' + (error.message || 'N/A') +
+                ', Stack: ' + (error.stack || 'N/A'), // Incluye detalles del stack si están disponibles
+            "DataExtension": nombre, // Nombre de la Data Extension donde se registra el error
+            "Fecha": fechaActual // Fecha actual
+        };
+        logExtensionDatos.Rows.Add(detallesError);
+    }
+
+    // Función para verificar si una Data Extension existe
+    function existeDE(nombre) {
+        // Recupera la Data Extension por nombre
+        var recuperarDE = DataExtension.Retrieve({ Property: "Name", SimpleOperator: "equals", Value: nombre });
+        // Devuelve verdadero si la DE existe, falso si no
+        return recuperarDE && recuperarDE.length > 0;
+    }
+
+    // Función para registrar las Data Extensions insertadas
+    function registrarInsercion(nombre) {
+        try {
+            var logExtensionDatos = DataExtension.Init("DE_01Logs_DEInsertadas");
+            var fechaActual = Platform.Function.SystemDateToLocalDate(Platform.Function.Now());
+            var detallesLog = {
+                "Fecha": fechaActual,
+                "NombreDECreada": nombre
+            };
+            logExtensionDatos.Rows.Add(detallesLog);
+        } catch (e) {
+            // Manejar cualquier error que pueda ocurrir al registrar la inserción
+            Write("Error al registrar la inserción: " + e.message);
+        }
+    }
+
+    // Función para crear una Data Extension si no existe
+    function crearDE(nombre) {
+        try {
+            // Define el objeto con la estructura de la nueva Data Extension
+            var objeto = {
+                "CustomerKey": nombre, // Clave única de la DE, usando el nombre del interés
+                "Name": nombre, // Nombre de la DE
+                "Fields": [
+                    // Define los campos de la DE
+                    { "Name": "Id", "FieldType": "Text", "IsPrimaryKey": true, "IsRequired": true, "MaxLength": 50 },
+                    { "Name": "Email", "FieldType": "EmailAddress", "MaxLength": 254 },
+                    { "Name": "Intereses", "FieldType": "Text", "MaxLength": 500 }
+                ]
+            };
+            // Intenta añadir la nueva DE al sistema
+            var estado = DataExtension.Add(objeto);
+            // Lanza un error si no se pudo crear la DE
+            if (estado != "OK") {
+                throw new Error("No se pudo crear la Data Extension: " + estado);
+            }
+
+            // Registra la creación exitosa en DE_01Logs_DEInsertadas
+            registrarInsercion(nombre); // Llama a la función registrarInsercion para registrar la inserción
+        } catch (e) {
+            // Si hay un error al crear la DE, lo registra en la DE de errores
+            registrarError("No se pudo crear la Data Extension " + nombre + ". Error: " + e.message);
+        }
+    }
+
+    // Función para distribuir registros en sus correspondientes Data Extensions
+    function distribuirRegistros() {
+        try {
+            var origenDE = DataExtension.Init(nombreDEOrigen);
+            var registros = origenDE.Rows.Retrieve();
+
+            for (var i = 0; i < registros.length; i++) {
+                var registro = registros[i];
+                var interes = registro.Intereses;
+
+                if (interes) {
+                    // Verificar si la Data Extension correspondiente ya existe
+                    if (!existeDE(interes)) {
+                        // Si no existe, crea la Data Extension
+                        crearDE(interes);
+                    }
+
+                    // Insertar el registro en la Data Extension correspondiente
+                    var destinoDE = DataExtension.Init(interes);
+                    destinoDE.Rows.Add(registro);
+                }
+            }
+        } catch (e) {
+            // Si hay un error en el proceso principal, lo registra en la DE de errores
+            registrarError("Error al distribuir registros: " + e.message);
+        }
+    }
+
+    // Bloque principal del script que se ejecuta
+    try {
+        // Recupera todos los registros de la DE de origen
+        var registros = DataExtension.Init(nombreDEOrigen).Rows.Retrieve();
+        // Itera a través de cada registro
+        for (var i = 0; i < registros.length; i++) {
+            // Obtiene el interés del registro actual
+            var interes = registros[i].Intereses;
+            var email = registros[i].Email;
+            // Si el interés no está vacío y la DE correspondiente no existe
+            if (interes && !existeDE(interes)) {
+                // Crea una nueva DE para ese interés
+                crearDE(interes);
+                // Llama a la función registrarInsercion para registrar la creación de la DE con su fecha
+                registrarInsercion(interes);
+            }
+        }
+        
+        // Distribuye los registros en las Data Extensions correspondientes
+        distribuirRegistros();
+    } catch (e) {
+        // Si hay un error en el script, lo registra en la DE de errores
+        registrarError("Error en el script general: " + e.message);
+    }
+</script>
