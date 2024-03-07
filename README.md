@@ -3,9 +3,9 @@ Ejercicios en SSJS (Server-Side JavaScript) para SFMC
 Ejercicio 1:
 Dado este DataSet generar un SSJS para que:
 
-	· revise registro por registro y cree una Data Extension si existe un interés que no tiene Data Extension
+	· Revise registro por registro y cree una Data Extension si existe un interés que no tiene Data Extension
 
-	· debe distribuir cada registro en su correspondiente Data Extension y no duplicar registros tenga un log que indique que empieza la revisión y que termina y si crea una Data Extension en qué fecha lo ha hecho
+	· Debe distribuir cada registro en su correspondiente Data Extension y no duplicar registros tenga un log que indique que empieza la revisión y que termina y si crea una Data Extension en qué fecha lo ha hecho
 
 ********CUIDADO CON EL RETRIEVE QUE SOLO TRAE UN MÁXIMO DE 2500 REGISTROS*************
 
