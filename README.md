@@ -4,7 +4,7 @@
 
 This repository contains two exercises implemented in Server-Side JavaScript (SSJS) for Salesforce Marketing Cloud (SFMC). These exercises demonstrate how to manipulate Data Extensions using SSJS, including dynamic Data Extension creation and selective data management based on specific criteria.
 
-# Exercise 1: Dynamic Data Extension Creation and Distribution
+# 👉🏼 Exercise 1: Dynamic Data Extension Creation and Distribution
 
 ## Description
 This exercise involves a script that processes a dataset record by record. The SSJS script performs the following actions:
@@ -16,7 +16,7 @@ This exercise involves a script that processes a dataset record by record. The S
 ## Implementation
 The script initializes the SFMC environment and defines functions for checking the existence of Data Extensions, creating new Data Extensions, logging insertions, and distributing records accordingly. Error handling is incorporated to log any issues encountered during execution.
 
-# Exercise 2: Automation to Delete Records Without Interest
+# 👉🏼 Exercise 2: Automation to Delete Records Without Interest
 
 ## Description
 This exercise automates the deletion of records that do not have an associated interest. In contrast to Exercise 1, this task can utilize queries.
