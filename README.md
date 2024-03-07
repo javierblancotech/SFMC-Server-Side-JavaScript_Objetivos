@@ -1,15 +1,20 @@
-Ejercicios en SSJS (Server-Side JavaScript) para SFMC
+Exercises in SSJS (Server-Side JavaScript) for SFMC
 
-Ejercicio 1:
-Dado este DataSet generar un SSJS para que:
+Exercise 1:
+Given this DataSet generate an SSJS to:
 
-	· Revise registro por registro y cree una Data Extension si existe un interés que no tiene Data Extension
+	- Review record by record and create a Data Extension if there is an interest that does not have a Data Extension.
 
-	· Debe distribuir cada registro en su correspondiente Data Extension y no duplicar registros tenga un log que indique que empieza la revisión y que termina y si crea una Data Extension en qué fecha lo ha hecho
+	- It must distribute each record in its corresponding Data Extension and not duplicate records have a log that indicates that the review starts and ends and if it creates a Data Extension on what date it has done it.
 
-********CUIDADO CON EL RETRIEVE QUE SOLO TRAE UN MÁXIMO DE 2500 REGISTROS*************
+******** BE CAREFUL WITH THE RETRIEVE THAT ONLY BRINGS A MAXIMUM OF 2500 RECORDS*************
 
 
-Ejercicio 2:
+Exercise 2:
 
-Un automatismo con un ssjs que elimine todos los registros que no tengan intereses. En este caso, a diferencia del anterior, puedes echar mano de querys.
+An automatism with a ssjs that deletes all records that have no interest. In this case, unlike the previous one, you can use queries.
+
+
+🌐 https://javierblancotech.com/
+📧 info@javierblancotech.com
+👉🏼 https://www.linkedin.com/in/javierblancotech/
