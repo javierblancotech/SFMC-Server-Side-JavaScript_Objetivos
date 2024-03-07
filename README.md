@@ -15,5 +15,7 @@ An automatism with a ssjs that deletes all records that have no interest. In thi
 
 
 🌐 https://javierblancotech.com/
+
 📧 info@javierblancotech.com
+
 👉🏼 https://www.linkedin.com/in/javierblancotech/
